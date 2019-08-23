@@ -1,6 +1,5 @@
 import DatabaseQuery.*;
 import me.tongfei.progressbar.ProgressBar;
-import sun.awt.image.SurfaceManager;
 
 public class Main {
     static {
@@ -38,11 +37,16 @@ public class Main {
         System.out.println(indexValue.stringify());
 
         ProgressBar pb = new ProgressBar("Getting contents", pidList.size());
-        int batch = 1024 * 32;
-        for (int i = 0; i < pidList.size(); i+=batch) {
+        int batch = 1024 * 128;
+        int i = 0;
+        for (i = batch; i < pidList.size(); i+=batch) {
             IdDataRecordVector idv = new IdDataRecordVector();
-            dqm.getContentByIdList(new StringVector(pidList.subList(i, i+batch)), idv);
+            dqm.getContentByIdList(new StringVector(pidList.subList(i-batch, i)), idv);
             pb.stepBy(batch);
         }
+        IdDataRecordVector idv = new IdDataRecordVector();
+        dqm.getContentByIdList(new StringVector(pidList.subList(i-batch, pidList.size())), idv);
+        pb.stepBy(pidList.size() - i + batch);
+        pb.close();
     }
 }
